@@ -3,3 +3,34 @@
 /* Original brand logo */
 .mark{overflow:hidden;flex-shrink:0;background:#000;}
 .mark img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;}
+
+/* Brand upgrade: prominent logo and readable slogan */
+.header{min-height:112px;height:auto;padding-top:10px;padding-bottom:10px}
+.header .mark{width:88px;height:88px;border:2px solid #d4af37;box-shadow:0 0 0 2px #0a0a0a,0 0 13px #d4af3740}
+.header .brand{min-width:0;gap:13px}
+.header .brand strong{font-size:21px}
+.header .brand small{font-size:12px}
+.brand-promise{padding:15px 20px;text-align:center;color:#f2d47d;background:#18130a;border-bottom:1px solid #82631d;font:600 clamp(15px,1.8vw,23px) Oswald,Arial,sans-serif;letter-spacing:1.3px}
+.topbar span{display:block}
+.ticker{font-weight:700;letter-spacing:2.5px;font-size:clamp(15px,2.5vw,22px);line-height:1.5}
+/* A brand-colored custom footprint pointer; never shown on touch devices */
+#cursor{position:fixed;top:0;left:0;width:38px;height:48px;z-index:100;pointer-events:none;display:none;object-fit:contain;transform:translate(-11px,-8px) rotate(-18deg);filter:drop-shadow(0 2px 4px #000)}
+.trail{position:fixed;pointer-events:none;z-index:99;width:23px;height:30px;object-fit:contain;animation:footprintFade .8s ease-out forwards;transform:translate(-10px,-10px) rotate(-18deg)}
+@keyframes footprintFade{to{opacity:0;transform:translate(-10px,-18px) rotate(-18deg) scale(.65)}}
+@media(pointer:fine) and (prefers-reduced-motion:no-preference){body,body a,body button,body input,body select,body textarea{cursor:none!important}#cursor{display:block}}
+@media(max-width:720px){
+.topbar{font-size:9px;padding:9px 5%}.topbar span{display:none}
+.header{height:auto;min-height:104px;padding:12px 4%;gap:10px}
+.header .mark{width:74px;height:74px}
+.header .brand{gap:8px;flex:1;min-width:0}
+.header .brand strong{font-size:clamp(11px,3.2vw,15px);line-height:1.2;letter-spacing:.6px}
+.header .brand small{font-size:9px;letter-spacing:1.2px}
+.header .btn.small{font-size:10px;padding:13px 11px;letter-spacing:.1px;max-width:122px;text-align:center;line-height:1.3;flex-shrink:0}
+.brand-promise{font-size:17px;padding:13px 16px;letter-spacing:.4px;line-height:1.35}
+.ticker{font-size:14px;letter-spacing:.5px;padding:17px 12px}
+}
+@media(max-width:370px){.header .mark{width:64px;height:64px}.header .brand strong{font-size:11px}.header .btn.small{font-size:9px;max-width:110px}}
+@media(pointer:coarse){#cursor,.trail{display:none!important}}
+@media(prefers-reduced-motion:reduce){#cursor,.trail{display:none!important}}
+
+.trail img{display:block;width:100%;height:100%}
