@@ -1,94 +1,157 @@
 
-const year = document.getElementById('year');
-if (year) year.textContent = new Date().getFullYear();
+"use strict";
 
-const dateField = document.querySelector('[name="preferred_date"]');
-if (dateField) {
-  const now = new Date();
-  const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-  dateField.min = localDate.toISOString().slice(0, 10);
-}
+// FRESH FOOTPRINTS CARPET CARE
+// Main website JavaScript
 
-const cursor = document.getElementById('cursor');
+document.addEventListener("DOMContentLoaded", () => {
 
-if (cursor && matchMedia('(pointer:fine) and (prefers-reduced-motion:no-preference)').matches) {
-  let last = 0;
-  document.addEventListener('pointermove', e => {
-    cursor.style.left = e.clientX + 'px';
-    cursor.style.top = e.clientY + 'px';
+  // AUTOMATIC COPYRIGHT YEAR
+  const year = document.getElementById("year");
 
-    if (Date.now() - last > 90) {
-      last = Date.now();
-      const t = document.createElement('span');
-      t.className = 'trail';
-      const icon = document.createElement('img');
-      icon.src = 'footprint-cursor.svg';
-      icon.alt = '';
-      t.appendChild(icon);
-      t.style.left = e.clientX + 'px';
-      t.style.top = e.clientY + 'px';
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 680);
-    }
-  });
-}
+  if (year) {
+    year.textContent = new Date().getFullYear();
+  }
 
-const form = document.getElementById('requestForm');
-const status = document.getElementById('formStatus');
+  // BOOKING DATE: PREVENT PAST DATES
+  const dateField = document.querySelector(
+    '[name="preferred_date"]'
+  );
 
-if (form && status) {
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
+  if (dateField) {
+    const now = new Date();
 
-    const cfg = window.FF_CONFIG || {};
+    const localDate = new Date(
+      now.getTime() -
+      now.getTimezoneOffset() * 60000
+    );
 
-    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) {
-      status.textContent = 'Booking is not connected yet.';
-      return;
-    }
+    dateField.min = localDate
+      .toISOString()
+      .slice(0, 10);
+  }
 
-    const data = Object.fromEntries(new FormData(form));
-    const button = form.querySelector('button[type="submit"]');
+  // CUSTOM FOOTPRINT CURSOR
+  const cursor = document.getElementById("cursor");
 
-    if (button) button.disabled = true;
-    status.textContent = 'Sending your request...';
+  const allowCursor =
+    window.matchMedia(
+      "(pointer: fine) and (prefers-reduced-motion: no-preference)"
+    ).matches;
 
-    try {
-      const url = cfg.supabaseUrl.replace(/\/$/, '') + '/rest/v1/booking_requests';
+  if (cursor && allowCursor) {
+    let lastTrail = 0;
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': cfg.supabaseAnonKey,
-          'Authorization': 'Bearer ' + cfg.supabaseAnonKey,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({
-          customer_name: data.name,
-          phone: data.phone,
-          email: data.email,
-          service_type: data.service,
-          address: data.city,
-          preferred_date: data.preferred_date || null,
-          preferred_time: data.preferred_time || null,
-          notes: data.details || '',
-          status: 'pending'
-        })
+    document.addEventListener("pointermove", (event) => {
+      cursor.style.left = event.clientX + "px";
+      cursor.style.top = event.clientY + "px";
+
+      const now = Date.now();
+
+      if (now - lastTrail < 90) return;
+
+      lastTrail = now;
+
+      const trail = document.createElement("span");
+      trail.className = "trail";
+
+      const footprint = document.createElement("img");
+      footprint.src = "footprint-cursor.svg";
+      footprint.alt = "";
+      footprint.setAttribute("aria-hidden", "true");
+
+      trail.appendChild(footprint);
+
+      trail.style.left = event.clientX + "px";
+      trail.style.top = event.clientY + "px";
+
+      document.body.appendChild(trail);
+
+      window.setTimeout(() => {
+        trail.remove();
+      }, 900);
+    });
+  } else if (cursor) {
+    cursor.style.display = "none";
+  }
+
+  // SMOOTH SCROLLING FOR INTERNAL LINKS
+  document.querySelectorAll('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const targetId = link.getAttribute("href");
+
+      if (!targetId || targetId === "#") return;
+
+      const target = document.getElementById(
+        targetId.slice(1)
+      );
+
+      if (!target) return;
+
+      event.preventDefault();
+
+      target.scrollIntoView({
+        behavior: window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches ? "auto" : "smooth",
+        block: "start"
       });
+    });
+  });
 
-      if (!response.ok) {
-        throw new Error('Booking request failed: ' + response.status);
+  // BOOKING FORM VALIDATION
+  const bookingForm = document.querySelector(
+    "#booking-form, form[data-booking]"
+  );
+
+  if (bookingForm) {
+    bookingForm.addEventListener("submit", (event) => {
+      if (!bookingForm.checkValidity()) {
+        event.preventDefault();
+        bookingForm.reportValidity();
+        return;
       }
 
-      form.reset();
-      status.textContent = 'Request received! We will contact you soon. Your appointment is not confirmed yet.';
+      // Allow the form's configured submission
+      // service to handle the booking request.
+    });
+  }
 
-    } catch (err) {
-      console.error('Booking error:', err);
-      status.textContent = 'We could not submit your request. Please try again later.';
-    } finally {
-      if (button) button.disabled = false;
-    }
-  });
-}
+  // REVEAL ELEMENTS ON SCROLL
+  const revealElements = document.querySelectorAll(
+    ".reveal"
+  );
+
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  if (
+    revealElements.length &&
+    "IntersectionObserver" in window &&
+    !reducedMotion
+  ) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.1
+      }
+    );
+
+    revealElements.forEach((element) => {
+      observer.observe(element);
+    });
+  } else {
+    revealElements.forEach((element) => {
+      element.classList.add("visible");
+    });
+  }
+
+});
