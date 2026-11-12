@@ -100,9 +100,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // BOOKING FORM VALIDATION
-  const bookingForm = document.querySelector(
-    "#booking-form, form[data-booking]"
-  );
+  const bookingForm = document.querySelector("#requestForm");
+  
 
   if (bookingForm) {
     bookingForm.addEventListener("submit", (event) => {
